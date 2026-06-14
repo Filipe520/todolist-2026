@@ -5,7 +5,7 @@ export default function BoxAlarm() {
   const { modalStatus, itensSelects } = useApp();
   return (
     <div
-      className={`w-70 min-h-12 absolute top-10 z-20 bg-zinc-200/10 backdrop-blur-lg  transition-opacity duration-300 ease-in ${modalStatus ? " opacity-100" : "opacity-0"} flex justify-start pl-3 py-1 rounded-lg border-l-4 border-l-green-500 flex-col text-left`}
+      className={`w-70 min-h-12 absolute top-10 z-20 bg-zinc-200/10 backdrop-blur-lg  transition-opacity duration-300 ease-in ${modalStatus ? " opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} flex justify-start pl-3 py-1 rounded-lg border-l-4 border-l-green-500 flex-col text-left`}
     >
       <h2 className="!text-sm !p-0 !m-0 !text-green-500">
         Adicionado com sucesso.

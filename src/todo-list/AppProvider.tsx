@@ -52,6 +52,7 @@ export interface PropFilter {
 // 1. Defina a tipagem de tudo o que estará disponível no Contexto
 interface AppContextType {
   checkoutRecover: () => void;
+  clearSelects: () => void;
   trashCan: (taskID: string) => void;
   addTask: () => void;
   btnSearch: () => void;
@@ -88,6 +89,10 @@ interface AppContextType {
   setStatusTrashCan: Dispatch<SetStateAction<boolean>>;
   btnMiddleTask: boolean;
   setBtnMiddleTask: Dispatch<SetStateAction<boolean>>;
+  btnFilters: boolean;
+  setBtnFilters: Dispatch<SetStateAction<boolean>>;
+  btnEnterEditTask: boolean;
+  setBtnEnterEditTask: Dispatch<SetStateAction<boolean>>;
 
   // Refs
   refInputTask: React.RefObject<HTMLInputElement>;
@@ -125,6 +130,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [editTask, setEditTask] = useState(false);
   const [statusTrashCan, setStatusTrashCan] = useState(false);
   const [btnMiddleTask, setBtnMiddleTask] = useState(false);
+  const [btnFilters, setBtnFilters] = useState(false);
+  const [btnEnterEditTask, setBtnEnterEditTask] = useState(false);
 
   const [task, setTask] = useState("");
   const [inputSearch, setInputSearch] = useState("");
@@ -253,6 +260,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Recuperar ou mover em lote
   const itensSelects = resControl.filter((itens) => itens.completed);
 
+  // Remove itens selecionados
+  const clearSelects = () => {
+    console.log("Clicou");
+    const itensClear = itensSelects.map((m) =>
+      m ? { ...m, completed: !m.completed } : m,
+    );
+    setTodos((prevItens) => [...prevItens, itensClear]);
+  };
+
+  // Adicionar os itens selecionados para a lixeira ou para o array principal
   const checkoutRecover = () => {
     const restoreItens = itensSelects.map((i) => ({
       ...i,
@@ -312,6 +329,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         setBtnMiddleTask,
         keyBtnPriority,
         setKeyBtnPriority,
+        btnFilters,
+        setBtnFilters,
+        btnEnterEditTask,
+        setBtnEnterEditTask,
+        clearSelects,
       }}
     >
       {children}

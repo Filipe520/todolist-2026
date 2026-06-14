@@ -1,8 +1,10 @@
-import { Button, Checkbox, Input } from "@heroui/react";
+import { Button, Checkbox, Input, TextArea } from "@heroui/react";
 import { useApp, type PropTodoList } from "../AppProvider";
 import BoxAlarm from "./boxAlarm";
 import Search from "./Search";
 import ProgressBar from "./ProgressBar";
+import { IoAdd } from "react-icons/io5";
+import { GoArrowLeft } from "react-icons/go";
 
 export default function TodoList() {
   const {
@@ -32,93 +34,143 @@ export default function TodoList() {
     keyBtnPriority,
     arrPriority,
     setKeyBtnPriority,
+    btnFilters,
+    setBtnFilters,
+    btnEnterEditTask,
+    setBtnEnterEditTask,
+    clearSelects,
   } = useApp();
 
-  const handleLayout = (title: string, array: PropTodoList[]) => {
+  const handleLayout = (title: string, taskArray: PropTodoList[]) => {
     return (
-      <div>
-        <h2>Chegou em {title}</h2>
-        {array?.length === 0 && (
-          <div className="w-100 h-50">
-            <p>Não tem nenhum tarefa. {title}</p>
+      !taskArray.length && (
+        <div className="max-w-150 w-full mx-auto relative min-h-30 bg-linear-to-l from-violet-400 via-violet-500 to-purple-600   rounded-2xl mt-5">
+          <div className="inset-0.5 rounded-2xl absolute  bg-white flex items-center justify-center flex-col py-2">
+            <h2 className="!text-gray-500">Que pena!</h2>
+            <p className="!text-gray-400">não há nenhuma tarefa em {title}.</p>
           </div>
-        )}
-      </div>
+        </div>
+      )
     );
   };
 
   return (
-    <div className="bg-black/60  p-4 w-full rounded-2xl max-w-200 min-h-[90dvh] mx-auto relative">
+    <div className="222222222overflow-y-hidden bg-black/60 bg-radial-[at_50%_0%] from-70% via-blue-950/30 via-100% to-100% from-zinc-950 to-blue-900/30  p-4  rounded-2xl min-h-[90dvh] mx-auto relative h-dvh w-dvw">
       {/* Barra de Progresso */}
       <ProgressBar />
       {/* Modal de Avisos */}
       <BoxAlarm />
+      {/* Modal para Adicionar mais tarefas */}
+      <div className="absolute bottom-25 right-5 size-15 bg-gray-700/20 backdrop-blur-lg z-10 rounded-2xl group">
+        <Button
+          className={"w-full h-full rounded-2xl"}
+          variant="ghost"
+          onPress={() => setBtnFilters(!btnFilters)}
+        >
+          <IoAdd className="size-full text-white group-hover:text-black" />
+        </Button>
+      </div>
+      {btnFilters && (
+        <div className="absolute bottom-42 z-30 right-5 max-w-50 w-full min-h-70 bg-white/90 backdrop-blur-lg rounded-2xl flex items-center justify-around flex-col p-2">
+          {[
+            { key: "todos", label: "Início" },
+            { key: "assets", label: "ativos" },
+            { key: "completed", label: "completados" },
+            { key: "trash", label: "lixo" },
+          ].map((btn) => (
+            <Button
+              onPress={() => {
+                if (btn.key === "trash") {
+                  setStatusTrashCan(true);
+                  setFilterBtn({ key: btn.key, label: btn.label });
+                } else {
+                  setStatusTrashCan(false);
+                  setFilterBtn({ key: btn.key, label: btn.label });
+                }
+                setModalStatus(!modalStatus);
+              }}
+              key={btn.key}
+              className=" w-full mx-auto"
+            >
+              {btn.label}
+            </Button>
+          ))}
+        </div>
+      )}
 
-      <div className="flex max-w-150 mx-auto mb-5 gap-2 bg-white/5 p-5 rounded-xl">
-        {[
-          { key: "todos", label: "todos" },
-          { key: "assets", label: "ativos" },
-          { key: "completed", label: "completados" },
-          { key: "trash", label: "lixo" },
-        ].map((btn) => (
-          <Button
-            onPress={() => {
-              if (btn.key === "trash") {
-                setStatusTrashCan(true);
-                setFilterBtn({ key: btn.key, label: btn.label });
-              } else {
-                setStatusTrashCan(false);
-                setFilterBtn({ key: btn.key, label: btn.label });
+      {/* Modal de Tela inteira para add tarefas */}
+      {btnEnterEditTask && (
+        <div className="inset-0 absolute bg-gray-100 md:rounded-2xl z-30 flex flex-col p-3">
+          <div className="py-5 shrink-0 flex items-center justify-start">
+            <Button onPress={() => setBtnEnterEditTask(!btnEnterEditTask)}>
+              <GoArrowLeft />
+            </Button>
+          </div>
+          <div className="flex-2 shrink-0">
+            <div className="flex items-center justify-center w-full">
+              <div className="flex-2">
+                <Input
+                  placeholder="Título"
+                  className="w-full h-10 rounded-none border-none  p-0 shadow-none outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      addTask();
+                      setTask("");
+                    }
+                  }}
+                  ref={refInputTask}
+                  type="text"
+                  value={task}
+                  onChange={(e) => setTask(e.target.value)}
+                />
+              </div>
+            </div>
+            <TextArea
+              aria-label="Detailed notes"
+              id="textarea-rows-6"
+              placeholder="Digite alguma tarefa"
+              rows={6}
+              className={
+                "w-full h-full rounded-none bg-transparent border-none shadow-none outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0"
               }
-              setModalStatus(!modalStatus);
-            }}
-            key={btn.key}
-            className="text-green-400 bg-white/5 w-full max-w-150 mx-auto"
-          >
-            {btn.label}
-          </Button>
-        ))}
-      </div>
-
-      <div className="w-full flex gap-2 justify-center my-2">
-        <Input
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              addTask();
-              setTask("");
-            }
-          }}
-          ref={refInputTask}
-          type="text"
-          className=" h-10 bg-white w-full max-w-100"
-          value={task}
-          placeholder="Digite algo"
-          onChange={(e) => setTask(e.target.value)}
-        />
-        {/* BTN ADD */}
-        <Button
-          className="max-w-30 w-full h-10 bg-gray-500"
-          onKeyDown={(event) => console.log(event.key)}
-          onClick={() => {
-            if (!task) refInputTask.current?.focus();
-            addTask();
-            setTask("");
-          }}
-        >
-          Add
-        </Button>
-        <Button
-          className="max-w-30 w-full h-10 bg-red-200 text-black"
-          onClick={() => {
-            setTask("");
-            refInputTask.current?.focus();
-          }}
-        >
-          limpar
-        </Button>
-      </div>
-
-      {/* Filtro Lixeira / Recuperar */}
+            />
+          </div>
+          <div className="shrink-0 flex items-center justify-between">
+            <div className="bg-amber-100">Colocar cor na tarefa?</div>
+            <div className="bg-amber-300">
+              Mudar fonte? Tamanho da letra? Alinhamento do texto?
+            </div>
+            <div className="bg-amber-600">
+              modal com três pontinhos. é dentro colocar excluír. Editar
+              prioridade, editar data para tocar alarme.
+            </div>
+          </div>
+          {/* BTN ADD */}
+          <div className="max-w-100 mx-auto w-full flex flex-1 justify-between items-center ">
+            <Button
+              className="max-w-30 w-full h-10 bg-gray-500"
+              onKeyDown={(event) => console.log(event.key)}
+              onClick={() => {
+                if (!task) refInputTask.current?.focus();
+                addTask();
+                setTask("");
+              }}
+            >
+              Adicionar
+            </Button>
+            <Button
+              className="max-w-30 w-full h-10 bg-red-200 text-black"
+              onClick={() => {
+                setTask("");
+                refInputTask.current?.focus();
+              }}
+            >
+              limpar
+            </Button>
+          </div>
+        </div>
+      )}
+      {/* Filtro Lixeira / Recuperar / remover selecionados */}
       <div className="w-full flex items-center justify-around bg-white/5 rounded-full px-2 p-0.5 mt-5">
         <p className="text-left text-gray-500 text-xs">
           {resControl.length} itens
@@ -135,6 +187,8 @@ export default function TodoList() {
           {statusTrashCan ? "Limpar deletados" : `Enviar para lixeira`}
         </Button>
 
+        <Button onPress={() => clearSelects()}>Remove selecionados</Button>
+
         {statusTrashCan && (
           <Button
             onPress={() => checkoutRecover()}
@@ -144,11 +198,9 @@ export default function TodoList() {
           </Button>
         )}
       </div>
-
       {/* Checkbox */}
-      <div className="flex flex-col gap-2 max-h-100 overflow-y-auto">
+      <div className="flex flex-col scrollbar-thumb-red-500/0 overflow-y-auto h-[80%] mask-b-from-90% mask-t-from-95%">
         {handleLayout(filterBtn.label, resControl)}
-
         {resControl.map((taskMap) => (
           <div
             key={taskMap.id}
@@ -184,20 +236,7 @@ export default function TodoList() {
             >
               {taskMap.task}
             </h2>
-            <div>
-              <h3>
-                Status Ativos:
-                <div
-                  className={`w-10 h-10  ${taskMap.active ? "bg-green-400" : "bg-red-400"}`}
-                ></div>
-              </h3>
-              <h3>
-                completados Ativos:{" "}
-                <div
-                  className={`w-10 h-10  ${taskMap.completed ? "bg-green-400" : "bg-red-400"}`}
-                ></div>
-              </h3>
-            </div>
+
             <div className="flex gap-2 flex-col">
               {!statusTrashCan && (
                 <div className="flex gap-2">
@@ -321,7 +360,6 @@ export default function TodoList() {
           </div>
         ))}
       </div>
-
       {/* Input de pesquisa */}
       <Search />
     </div>
