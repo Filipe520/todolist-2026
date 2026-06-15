@@ -262,11 +262,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // Remove itens selecionados
   const clearSelects = () => {
-    console.log("Clicou");
-    const itensClear = itensSelects.map((m) =>
-      m ? { ...m, completed: !m.completed } : m,
-    );
-    setTodos((prevItens) => [...prevItens, itensClear]);
+    setTodos((prev) => prev.map((m) => ({ ...m, completed: false })));
   };
 
   // Adicionar os itens selecionados para a lixeira ou para o array principal

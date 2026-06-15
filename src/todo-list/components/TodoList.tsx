@@ -100,7 +100,7 @@ export default function TodoList() {
 
       {/* Modal de Tela inteira para add tarefas */}
       {btnEnterEditTask && (
-        <div className="inset-0 absolute bg-gray-100 md:rounded-2xl z-30 flex flex-col p-3">
+        <div className="inset-0 absolute bg-gray-900 md:rounded-2xl z-30 flex flex-col p-3">
           <div className="py-5 shrink-0 flex items-center justify-start">
             <Button onPress={() => setBtnEnterEditTask(!btnEnterEditTask)}>
               <GoArrowLeft />
